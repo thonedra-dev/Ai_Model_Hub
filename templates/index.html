@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>AI Model Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(138, 43, 226, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(0, 150, 255, 0.1) 0%, transparent 40%);
+            animation: backgroundShift 20s ease infinite;
+            pointer-events: none;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-10px, 20px) scale(1.05); }
+            66% { transform: translate(10px, -15px) scale(0.98); }
+        }
+
+        /* Grid Background Pattern */
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 60px 40px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header { 
+            text-align: center; 
+            margin-bottom: 70px;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -30px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #00d4ff, transparent);
+            border-radius: 2px;
+        }
+
+        h1 { 
+            font-size: 56px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d4ff 0%, #7b68ee 50%, #ff00ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            letter-spacing: -1px;
+            animation: titleGlow 3s ease-in-out infinite;
+            position: relative;
+        }
+
+        @keyframes titleGlow {
+            0%, 100% { filter: brightness(1) drop-shadow(0 0 20px rgba(0, 212, 255, 0.3)); }
+            50% { filter: brightness(1.2) drop-shadow(0 0 30px rgba(123, 104, 238, 0.5)); }
+        }
+
+        .header p {
+            font-size: 18px;
+            color: #a0a0b0;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+        }
+
+        .model-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); 
+            gap: 30px;
+            perspective: 1000px;
+        }
+
+        .model-card { 
+            background: rgba(20, 20, 30, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 35px 30px;
+            text-align: center;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .model-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(123, 104, 238, 0.1));
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            border-radius: 24px;
+            z-index: 0;
+        }
+
+        .model-card::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.2), transparent 70%);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s ease, height 0.6s ease;
+            z-index: 0;
+        }
+
+        .model-card:hover::before {
+            opacity: 1;
+        }
+
+        .model-card:hover::after {
+            width: 400px;
+            height: 400px;
+        }
+
+        .model-card:hover { 
+            transform: translateY(-12px) scale(1.02);
+            border-color: rgba(0, 212, 255, 0.4);
+            box-shadow: 
+                0 20px 60px rgba(0, 212, 255, 0.3),
+                0 0 40px rgba(123, 104, 238, 0.2),
+                inset 0 0 30px rgba(0, 212, 255, 0.05);
+        }
+
+        .model-card > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .model-icon { 
+            font-size: 64px;
+            margin-bottom: 20px;
+            display: inline-block;
+            filter: drop-shadow(0 4px 12px rgba(0, 212, 255, 0.3));
+            animation: iconFloat 3s ease-in-out infinite;
+        }
+
+        @keyframes iconFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .model-card:hover .model-icon {
+            animation: iconFloatHover 0.6s ease-in-out infinite;
+            filter: drop-shadow(0 6px 20px rgba(0, 212, 255, 0.6));
+        }
+
+        @keyframes iconFloatHover {
+            0%, 100% { transform: translateY(-8px) scale(1); }
+            50% { transform: translateY(-12px) scale(1.1); }
+        }
+
+        .model-title { 
+            font-size: 22px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 12px;
+            letter-spacing: 0.3px;
+        }
+
+        .model-desc { 
+            color: #9ca3af;
+            font-size: 14px;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .model-btn { 
+            display: inline-block; 
+            padding: 14px 32px; 
+            background: linear-gradient(135deg, #00d4ff 0%, #7b68ee 100%);
+            color: #ffffff;
+            text-decoration: none; 
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+            outline: none;
+            width: 160px;
+            box-sizing: border-box;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .model-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .model-btn:hover::before {
+            left: 100%;
+        }
+
+        .model-btn:hover { 
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 212, 255, 0.5);
+        }
+
+        .model-btn:active {
+            transform: translateY(0px);
+        }
+
+        .model-btn.get-mode {
+            background: linear-gradient(135deg, #00ff88 0%, #00b894 100%);
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .model-btn.get-mode:hover {
+            box-shadow: 0 6px 25px rgba(0, 255, 136, 0.5);
+        }
+
+        .mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 18px;
+            color: #a0a0b0;
+            cursor: pointer;
+            padding: 0;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            z-index: 2;
+        }
+
+        .mode-toggle:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.3);
+            color: #00d4ff;
+            transform: rotate(90deg);
+        }
+
+        .mode-toggle.active {
+            color: #00ff88;
+            background: rgba(0, 255, 136, 0.15);
+            border-color: rgba(0, 255, 136, 0.3);
+            animation: togglePulse 0.6s ease;
+        }
+
+        @keyframes togglePulse {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.2) rotate(180deg); }
+        }
+
+        .mode-indicator {
+            font-size: 12px;
+            color: #6b7280;
+            margin-top: 12px;
+            height: 16px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .mode-toggle::after {
+            content: attr(title);
+            position: absolute;
+            top: -45px;
+            right: 0;
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .mode-toggle:hover::after {
+            opacity: 1;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .model-btn span {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 40px 20px;
+            }
+
+            h1 {
+                font-size: 42px;
+            }
+
+            .header p {
+                font-size: 16px;
+            }
+
+            .model-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .model-card {
+                padding: 30px 25px;
+            }
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a0f;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #00d4ff, #7b68ee);
+            border-radius: 5px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #00e5ff, #8b78ff);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🤖 AI Model Hub</h1>
+            <p>Select a machine learning model to use or download</p>
+        </div>
+        
+        <div class="model-grid">
+            <!-- Spam Email Detector -->
+            <div class="model-card" data-model="spam">
+                <button class="mode-toggle" aria-label="Toggle mode" title="Click to switch to download mode">⚙️</button>
+                <div class="model-icon">📧</div>
+                <div class="model-title">Spam Email Detector</div>
+                <div class="model-desc">Detect spam emails using deep learning</div>
+                <button class="model-btn" data-use-link="/email" data-get-link="https://drive.google.com/drive/folders/1kdgvtYzMZKnG9-ow26Ydf46SU4V8K9JG?usp=drive_link">
+                    <span>Use Model</span>
+                </button>
+                <div class="mode-indicator">Mode: Use in browser</div>
+            </div>
+            
+            <!-- House Price Predictor -->
+            <div class="model-card" data-model="house">
+                <button class="mode-toggle" aria-label="Toggle mode" title="Click to switch to download mode">⚙️</button>
+                <div class="model-icon">🏠</div>
+                <div class="model-title">House Price Predictor</div>
+                <div class="model-desc">Predict house prices based on features</div>
+                <button class="model-btn" data-use-link="/house" data-get-link="https://drive.google.com/drive/folders/1W0dmy39q-LobPmNr3pexNq7I94a_5FUg?usp=drive_link">
+                    <span>Use Model</span>
+                </button>
+                <div class="mode-indicator">Mode: Use in browser</div>
+            </div>
+            
+            <!-- Car Price Predictor -->
+            <div class="model-card" data-model="car">
+                <button class="mode-toggle" aria-label="Toggle mode" title="Click to switch to download mode">⚙️</button>
+                <div class="model-icon">🚗</div>
+                <div class="model-title">Car Price Predictor</div>
+                <div class="model-desc">Estimate car prices from specifications</div>
+                <button class="model-btn" data-use-link="/car" data-get-link="https://drive.google.com/drive/folders/1yoFmnzgW95thAzdPzS9jHnV50QHdR2tJ?usp=drive_link">
+                    <span>Use Model</span>
+                </button>
+                <div class="mode-indicator">Mode: Use in browser</div>
+            </div>
+            
+            <!-- Wine Quality Predictor -->
+            <div class="model-card" data-model="wine">
+                <button class="mode-toggle" aria-label="Toggle mode" title="Click to switch to download mode">⚙️</button>
+                <div class="model-icon">🍷</div>
+                <div class="model-title">Wine Quality Predictor</div>
+                <div class="model-desc">Predict wine quality points (0-100)</div>
+                <button class="model-btn" data-use-link="/wine" data-get-link="https://drive.google.com/drive/folders/1FHz2yPy10KcOUWYVNtwc-R2_MVcQc5JS?usp=drive_link">
+                    <span>Use Model</span>
+                </button>
+                <div class="mode-indicator">Mode: Use in browser</div>
+            </div>
+            
+            <!-- Student Performance -->
+            <div class="model-card" data-model="student">
+                <button class="mode-toggle" aria-label="Toggle mode" title="Click to switch to download mode">⚙️</button>
+                <div class="model-icon">🎓</div>
+                <div class="model-title">Student Performance</div>
+                <div class="model-desc">Predict student academic performance</div>
+                <button class="model-btn" data-use-link="/student" data-get-link="https://drive.google.com/drive/folders/1ZY9zdnn4ID5-XaLPv4212Y2wJUGsuSfB?usp=drive_link">
+                    <span>Use Model</span>
+                </button>
+                <div class="mode-indicator">Mode: Use in browser</div>
+            </div>
+            
+            <!-- Cancer Status Predictor -->
+            <div class="model-card" data-model="cancer">
+                <button class="mode-toggle" aria-label="Toggle mode" title="Click to switch to download mode">⚙️</button>
+                <div class="model-icon">🧬</div>
+                <div class="model-title">Cancer Status Predictor</div>
+                <div class="model-desc">Predict cancer patient status</div>
+                <button class="model-btn" data-use-link="/cancer" data-get-link="https://drive.google.com/drive/folders/16TRNjQpYoCV2QzpcE_9YXOP6oNdF8b-8?usp=drive_link">
+                    <span>Use Model</span>
+                </button>
+                <div class="mode-indicator">Mode: Use in browser</div>
+            </div>
+            
+            <!-- PDF Summarizer -->
+            <div class="model-card" data-model="pdf">
+                <button class="mode-toggle" aria-label="Toggle mode" title="Click to switch to download mode">⚙️</button>
+                <div class="model-icon">📄</div>
+                <div class="model-title">PDF Summarizer</div>
+                <div class="model-desc">Generate AI summaries of PDF documents</div>
+                <button class="model-btn" data-use-link="/pdf-summarizer" data-get-link="https://drive.google.com/drive/folders/1piucJcIG4yAoTAcGwreJkicjSde7dACm?usp=drive_link">
+                    <span>Use Model</span>
+                </button>
+                <div class="mode-indicator">Mode: Use in browser</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize model cards from localStorage if available
+            initializeModelCards();
+            
+            // Add click event to all toggle buttons
+            document.querySelectorAll('.mode-toggle').forEach(toggleBtn => {
+                toggleBtn.addEventListener('click', function() {
+                    const modelCard = this.closest('.model-card');
+                    toggleModelMode(modelCard);
+                });
+            });
+            
+            // Add click event to all model buttons
+            document.querySelectorAll('.model-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const modelCard = this.closest('.model-card');
+                    const modelId = modelCard.dataset.model;
+                    const isGetMode = localStorage.getItem(`model-${modelId}-mode`) === 'get';
+                    
+                    if (isGetMode) {
+                        // In "Get Model" mode - open download link in new tab
+                        const getLink = this.dataset.getLink;
+                        window.open(getLink, '_blank');
+                    } else {
+                        // In "Use Model" mode - navigate to app page
+                        const useLink = this.dataset.useLink;
+                        window.location.href = useLink;
+                    }
+                });
+            });
+            
+            function initializeModelCards() {
+                // Set initial state for each model card based on localStorage
+                document.querySelectorAll('.model-card').forEach(card => {
+                    const modelId = card.dataset.model;
+                    const isGetMode = localStorage.getItem(`model-${modelId}-mode`) === 'get';
+                    
+                    if (isGetMode) {
+                        setModeToGet(card);
+                    } else {
+                        setModeToUse(card);
+                    }
+                });
+            }
+            
+            function toggleModelMode(modelCard) {
+                const modelId = modelCard.dataset.model;
+                const isCurrentlyGetMode = localStorage.getItem(`model-${modelId}-mode`) === 'get';
+                const toggleBtn = modelCard.querySelector('.mode-toggle');
+                
+                if (isCurrentlyGetMode) {
+                    // Switch to "Use Model" mode
+                    setModeToUse(modelCard);
+                    localStorage.setItem(`model-${modelId}-mode`, 'use');
+                } else {
+                    // Switch to "Get Model" mode
+                    setModeToGet(modelCard);
+                    localStorage.setItem(`model-${modelId}-mode`, 'get');
+                }
+                
+                // Add visual feedback on the toggle button
+                toggleBtn.classList.add('active');
+                setTimeout(() => {
+                    toggleBtn.classList.remove('active');
+                }, 300);
+            }
+            
+            function setModeToUse(modelCard) {
+                const btn = modelCard.querySelector('.model-btn');
+                const indicator = modelCard.querySelector('.mode-indicator');
+                const toggleBtn = modelCard.querySelector('.mode-toggle');
+                
+                btn.classList.remove('get-mode');
+                btn.querySelector('span').textContent = 'Use Model';
+                indicator.textContent = 'Mode: Use in browser';
+                toggleBtn.title = 'Click to switch to download mode';
+            }
+            
+            function setModeToGet(modelCard) {
+                const btn = modelCard.querySelector('.model-btn');
+                const indicator = modelCard.querySelector('.mode-indicator');
+                const toggleBtn = modelCard.querySelector('.mode-toggle');
+                
+                btn.classList.add('get-mode');
+                btn.querySelector('span').textContent = 'Get Model';
+                indicator.textContent = 'Mode: Download model';
+                toggleBtn.title = 'Click to switch to use mode';
+            }
+        });
+    </script>
+</body>
+</html>
