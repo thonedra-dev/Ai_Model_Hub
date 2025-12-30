@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Car Price Prediction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #0a0a0f;
+            color: #e0e0e0;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Animated Background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(120, 119, 198, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(138, 43, 226, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(0, 150, 255, 0.1) 0%, transparent 40%);
+            animation: backgroundShift 20s ease infinite;
+            pointer-events: none;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-10px, 20px) scale(1.05); }
+            66% { transform: translate(10px, -15px) scale(0.98); }
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+            opacity: 0.4;
+        }
+
+        .page-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Back Button */
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #00d4ff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            margin-bottom: 30px;
+        }
+
+        .back-btn:hover {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.3);
+            transform: translateX(-5px);
+        }
+
+        /* Hero Section */
+        .hero-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            margin-bottom: 60px;
+            align-items: center;
+        }
+
+        .hero-content h1 {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d4ff 0%, #7b68ee 50%, #ff00ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero-content p {
+            font-size: 18px;
+            color: #a0a0b0;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px;
+            background: rgba(0, 212, 255, 0.05);
+            border: 1px solid rgba(0, 212, 255, 0.15);
+            border-radius: 10px;
+            font-size: 14px;
+            color: #d1d5db;
+        }
+
+        .feature-icon {
+            font-size: 20px;
+        }
+
+        .hero-image {
+            position: relative;
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 212, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: brightness(0.9);
+            transition: transform 0.5s ease;
+        }
+
+        .hero-image:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Form Container */
+        .form-container {
+            background: rgba(20, 20, 30, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            margin-bottom: 40px;
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.1);
+            z-index: 0;
+        }
+
+        .progress-fill {
+            position: absolute;
+            top: 20px;
+            left: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #00d4ff, #7b68ee);
+            transition: width 0.3s ease;
+            z-index: 1;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+
+        .step.active {
+            background: linear-gradient(135deg, #00d4ff, #7b68ee);
+            border-color: #00d4ff;
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        }
+
+        .step.completed {
+            background: rgba(0, 255, 136, 0.2);
+            border-color: #00ff88;
+        }
+
+        .step-label {
+            position: absolute;
+            top: 50px;
+            font-size: 12px;
+            color: #9ca3af;
+            white-space: nowrap;
+        }
+
+        /* Form Steps */
+        .form-step {
+            display: none;
+            animation: fadeSlideIn 0.4s ease;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        @keyframes fadeSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .step-title {
+            font-size: 24px;
+            color: #ffffff;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .step-subtitle {
+            color: #9ca3af;
+            margin-bottom: 30px;
+            font-size: 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #d1d5db;
+            font-size: 14px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 18px;
+            background: rgba(10, 10, 20, 0.6);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: #e0e0e0;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: rgba(0, 212, 255, 0.5);
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.2);
+            background: rgba(10, 10, 20, 0.8);
+        }
+
+        /* Button Container */
+        .button-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 35px;
+        }
+
+        button {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-prev {
+            background: rgba(255, 255, 255, 0.05);
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-prev:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(-3px);
+        }
+
+        .btn-next, .btn-submit {
+            background: linear-gradient(135deg, #00d4ff 0%, #7b68ee 100%);
+            color: #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+        }
+
+        .btn-next::before, .btn-submit::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-next:hover::before, .btn-submit:hover::before {
+            left: 100%;
+        }
+
+        .btn-next:hover, .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(0, 212, 255, 0.5);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        #status {
+            text-align: center;
+            margin-top: 25px;
+            font-size: 16px;
+            color: #00d4ff;
+            min-height: 24px;
+        }
+
+        #result {
+            margin-top: 30px;
+            padding: 30px;
+            border-radius: 16px;
+            display: none;
+            font-size: 32px;
+            font-weight: 800;
+            text-align: center;
+            background: rgba(0, 255, 136, 0.1);
+            color: #00ff88;
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            box-shadow: 0 0 30px rgba(0, 255, 136, 0.2);
+            animation: resultSlideIn 0.5s ease;
+        }
+
+        @keyframes resultSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .hero-section {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .hero-content h1 {
+                font-size: 36px;
+            }
+
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-container {
+                padding: 30px 25px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .hero-content h1 {
+                font-size: 32px;
+            }
+
+            .progress-bar {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .step-label {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <a href="/" class="back-btn">← Back to Hub</a>
+
+        <!-- Hero Section -->
+        <div class="hero-section">
+            <div class="hero-content">
+                <h1>🚗 Car Price Predictor</h1>
+                <p>Our AI-powered valuation engine analyzes multiple vehicle attributes including manufacturer, model year, mileage, engine specifications, and premium features to deliver accurate market price estimates for used cars.</p>
+                
+                <div class="feature-grid">
+                    <div class="feature-item">
+                        <span class="feature-icon">🎯</span>
+                        <span>Precise Valuations</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">⚡</span>
+                        <span>Instant Results</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">📊</span>
+                        <span>Market Analysis</span>
+                    </div>
+                    <div class="feature-item">
+                        <span class="feature-icon">🔧</span>
+                        <span>11 Key Features</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-image">
+                <img src="/static/images/car.jpg" alt="Car Price Prediction AI">
+            </div>
+        </div>
+
+        <!-- Form Section -->
+        <div class="form-container">
+            <!-- Progress Bar -->
+            <div class="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                    <div class="step active" data-step="1">
+                        1
+                        <span class="step-label">Vehicle Info</span>
+                    </div>
+                    <div class="step" data-step="2">
+                        2
+                        <span class="step-label">Specifications</span>
+                    </div>
+                    <div class="step" data-step="3">
+                        3
+                        <span class="step-label">Features</span>
+                    </div>
+                    <div class="step" data-step="4">
+                        4
+                        <span class="step-label">Safety</span>
+                    </div>
+                </div>
+            </div>
+
+            <form id="carForm">
+                <!-- Step 1: Vehicle Information -->
+                <div class="form-step active" data-step="1">
+                    <h3 class="step-title">Vehicle Information</h3>
+                    <p class="step-subtitle">Basic details about the car</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="Manufacturer">Manufacturer:</label>
+                            <input type="text" id="Manufacturer" name="Manufacturer" placeholder="e.g., Toyota, BMW" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="Model">Model:</label>
+                            <input type="text" id="Model" name="Model" placeholder="e.g., Camry, 3 Series" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="Prod. year">Production Year:</label>
+                            <input type="number" id="Prod. year" name="Prod. year" min="1970" max="2024" placeholder="e.g., 2020" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="Category">Category:</label>
+                            <input type="text" id="Category" name="Category" placeholder="e.g., Sedan, SUV" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 2: Specifications -->
+                <div class="form-step" data-step="2">
+                    <h3 class="step-title">Vehicle Specifications</h3>
+                    <p class="step-subtitle">Engine and mileage details</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="Mileage">Mileage (km):</label>
+                            <input type="number" id="Mileage" name="Mileage" min="0" placeholder="e.g., 50000" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="Engine volume">Engine Volume (L):</label>
+                            <input type="number" id="Engine volume" name="Engine volume" min="0" step="0.1" placeholder="e.g., 2.0" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Features -->
+                <div class="form-step" data-step="3">
+                    <h3 class="step-title">Features & Configuration</h3>
+                    <p class="step-subtitle">Interior and drivetrain options</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="Leather interior">Leather Interior:</label>
+                            <select id="Leather interior" name="Leather interior" required>
+                                <option value="">Select option</option>
+                                <option value="Yes">Yes</option>
+                                <option value="No">No</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="Fuel type">Fuel Type:</label>
+                            <input type="text" id="Fuel type" name="Fuel type" placeholder="e.g., Petrol, Diesel" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="Gear box type">Gear Box Type:</label>
+                            <input type="text" id="Gear box type" name="Gear box type" placeholder="e.g., Automatic, Manual" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="Drive wheels">Drive Wheels:</label>
+                            <input type="text" id="Drive wheels" name="Drive wheels" placeholder="e.g., Front, 4x4" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Step 4: Safety Features -->
+                <div class="form-step" data-step="4">
+                    <h3 class="step-title">Safety Features</h3>
+                    <p class="step-subtitle">Safety equipment information</p>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="Airbags">Number of Airbags:</label>
+                            <input type="number" id="Airbags" name="Airbags" min="0" max="20" placeholder="e.g., 6" required>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Navigation Buttons -->
+                <div class="button-container">
+                    <button type="button" class="btn-prev" id="prevBtn" style="display: none;">← Previous</button>
+                    <button type="button" class="btn-next" id="nextBtn">Next →</button>
+                    <button type="submit" class="btn-submit" id="submitBtn" style="display: none;">💰 Predict Price</button>
+                </div>
+            </form>
+            
+            <div id="status"></div>
+            <div id="result"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+        const totalSteps = 4;
+
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const progressFill = document.getElementById('progressFill');
+
+        function updateProgress() {
+            const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+            progressFill.style.width = progress + '%';
+
+            document.querySelectorAll('.step').forEach((step, index) => {
+                if (index < currentStep) {
+                    step.classList.add('completed');
+                    step.classList.remove('active');
+                } else if (index === currentStep - 1) {
+                    step.classList.add('active');
+                    step.classList.remove('completed');
+                } else {
+                    step.classList.remove('active', 'completed');
+                }
+            });
+        }
+
+        function showStep(step) {
+            document.querySelectorAll('.form-step').forEach((formStep) => {
+                formStep.classList.remove('active');
+            });
+            document.querySelector(`.form-step[data-step="${step}"]`).classList.add('active');
+
+            prevBtn.style.display = step === 1 ? 'none' : 'block';
+            nextBtn.style.display = step === totalSteps ? 'none' : 'block';
+            submitBtn.style.display = step === totalSteps ? 'block' : 'none';
+
+            updateProgress();
+        }
+
+        function validateCurrentStep() {
+            const currentFormStep = document.querySelector(`.form-step[data-step="${currentStep}"]`);
+            const inputs = currentFormStep.querySelectorAll('input[required], select[required]');
+            
+            for (let input of inputs) {
+                if (!input.value || !input.checkValidity()) {
+                    input.reportValidity();
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (validateCurrentStep() && currentStep < totalSteps) {
+                currentStep++;
+                showStep(currentStep);
+            }
+        });
+
+        prevBtn.addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                showStep(currentStep);
+            }
+        });
+
+        document.getElementById('carForm').onsubmit = async (e) => {
+            e.preventDefault();
+            
+            if (!validateCurrentStep()) {
+                return;
+            }
+
+            const status = document.getElementById('status');
+            const result = document.getElementById('result');
+            const formData = new FormData(document.getElementById('carForm'));
+            
+            status.innerHTML = '🔄 Analyzing vehicle data...';
+            result.style.display = 'none';
+            
+            try {
+                const response = await fetch('/predict_car', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const resultHtml = await response.text();
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = resultHtml;
+                const resultContent = tempDiv.querySelector('#carPredictionResult');
+                
+                if (response.ok) {
+                    status.innerHTML = '';
+                    result.innerHTML = resultContent.innerHTML;
+                    result.style.display = 'block';
+                } else {
+                    status.innerHTML = `<span style="color:#ff4757">❌ Error: ${resultContent?.innerHTML || 'Unknown error'}</span>`;
+                }
+            } catch (error) {
+                status.innerHTML = '<span style="color:#ff4757">❌ Error connecting to server.</span>';
+                console.error(error);
+            }
+        };
+
+        // Initialize
+        showStep(1);
+    </script>
+</body>
+</html>

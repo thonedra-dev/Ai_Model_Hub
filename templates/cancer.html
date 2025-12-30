@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cancer Status Prediction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #050508;
+            color: #e0e0e0;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Medical grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 50%, rgba(16, 185, 129, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.08) 0%, transparent 50%);
+            animation: medicalPulse 15s ease infinite;
+            pointer-events: none;
+        }
+
+        @keyframes medicalPulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.05); }
+        }
+
+        body::after {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        .page-wrapper {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Navigation Bar */
+        .top-nav {
+            background: rgba(10, 10, 15, 0.8);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            font-size: 24px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 10px;
+            color: #10b981;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .back-btn:hover {
+            background: rgba(16, 185, 129, 0.2);
+            transform: translateX(-3px);
+        }
+
+        /* Split Layout */
+        .main-content {
+            display: grid;
+            grid-template-columns: 400px 1fr;
+            flex: 1;
+            height: calc(100vh - 80px);
+        }
+
+        /* Left Sidebar - Info Panel */
+        .info-panel {
+            background: rgba(10, 10, 15, 0.6);
+            backdrop-filter: blur(20px);
+            border-right: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 40px 30px;
+            overflow-y: auto;
+        }
+
+        .info-panel::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .info-panel::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .info-panel::-webkit-scrollbar-thumb {
+            background: rgba(16, 185, 129, 0.3);
+            border-radius: 3px;
+        }
+
+        .panel-header {
+            margin-bottom: 30px;
+        }
+
+        .panel-header h1 {
+            font-size: 32px;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 15px;
+            line-height: 1.2;
+        }
+
+        .panel-header p {
+            color: #9ca3af;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 200px;
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 25px 0;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            box-shadow: 0 10px 40px rgba(16, 185, 129, 0.2);
+        }
+
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .info-section {
+            margin-top: 30px;
+        }
+
+        .info-section h3 {
+            font-size: 16px;
+            color: #10b981;
+            font-weight: 700;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .info-list {
+            list-style: none;
+        }
+
+        .info-list li {
+            padding: 12px 0;
+            color: #d1d5db;
+            font-size: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .info-list li::before {
+            content: "●";
+            color: #10b981;
+            font-size: 12px;
+        }
+
+        .medical-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 20px;
+            font-size: 13px;
+            color: #10b981;
+            font-weight: 600;
+            margin-top: 20px;
+        }
+
+        /* Right Side - Form Area */
+        .form-area {
+            padding: 40px;
+            overflow-y: auto;
+            background: rgba(5, 5, 8, 0.4);
+        }
+
+        .form-area::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .form-area::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .form-area::-webkit-scrollbar-thumb {
+            background: rgba(16, 185, 129, 0.3);
+            border-radius: 4px;
+        }
+
+        .form-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .form-header {
+            margin-bottom: 40px;
+        }
+
+        .form-header h2 {
+            font-size: 28px;
+            color: #ffffff;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .form-header .subtitle {
+            color: #9ca3af;
+            font-size: 15px;
+        }
+
+        /* Tabbed Categories */
+        .category-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 35px;
+            flex-wrap: wrap;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #9ca3af;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .tab.active {
+            background: rgba(16, 185, 129, 0.15);
+            border-color: rgba(16, 185, 129, 0.4);
+            color: #10b981;
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+        }
+
+        .tab:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-content {
+            display: none;
+            animation: tabFadeIn 0.4s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes tabFadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #d1d5db;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #e0e0e0;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        select {
+            cursor: pointer;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: rgba(16, 185, 129, 0.5);
+            background: rgba(255, 255, 255, 0.05);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+        }
+
+        .submit-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        button[type="submit"] {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.4);
+        }
+
+        button[type="submit"]::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s ease;
+        }
+
+        button[type="submit"]:hover::before {
+            left: 100%;
+        }
+
+        button[type="submit"]:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 30px rgba(16, 185, 129, 0.5);
+        }
+
+        #status {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 15px;
+            color: #10b981;
+            min-height: 24px;
+        }
+
+        #result {
+            margin-top: 30px;
+            padding: 30px;
+            border-radius: 16px;
+            display: none;
+            font-size: 24px;
+            font-weight: 700;
+            text-align: center;
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+            animation: resultSlideIn 0.5s ease;
+        }
+
+        @keyframes resultSlideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .info-panel {
+                border-right: none;
+                border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .top-nav {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .form-area {
+                padding: 25px 20px;
+            }
+
+            .info-panel {
+                padding: 25px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Top Navigation -->
+        <div class="top-nav">
+            <div class="nav-brand">🧬 Medical AI Analytics</div>
+            <a href="/" class="back-btn">← Back to Hub</a>
+        </div>
+
+        <!-- Main Split Content -->
+        <div class="main-content">
+            <!-- Left Info Panel -->
+            <div class="info-panel">
+                <div class="panel-header">
+                    <h1>Cancer Status Prediction</h1>
+                    <p>Advanced machine learning model for cancer prognosis analysis</p>
+                </div>
+
+                <div class="hero-image">
+                    <img src="/static/images/breast_cancer.jpg" alt="Cancer Analysis AI">
+                </div>
+
+                <div class="medical-badge">
+                    <span>🔬</span>
+                    <span>Clinical Decision Support</span>
+                </div>
+
+                <div class="info-section">
+                    <h3>Model Capabilities</h3>
+                    <ul class="info-list">
+                        <li>TNM staging analysis</li>
+                        <li>Demographic factor evaluation</li>
+                        <li>Tumor characteristics assessment</li>
+                        <li>Lymph node status integration</li>
+                        <li>Multi-variable risk stratification</li>
+                    </ul>
+                </div>
+
+                <div class="info-section">
+                    <h3>Input Categories</h3>
+                    <ul class="info-list">
+                        <li>Patient Demographics</li>
+                        <li>TNM Staging System</li>
+                        <li>Tumor Properties</li>
+                        <li>Lymph Node Data</li>
+                        <li>Clinical Timeline</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Right Form Area -->
+            <div class="form-area">
+                <div class="form-container">
+                    <div class="form-header">
+                        <h2>Patient Data Input</h2>
+                        <p class="subtitle">Enter comprehensive patient information for accurate prediction</p>
+                    </div>
+
+                    <!-- Category Tabs -->
+                    <div class="category-tabs">
+                        <div class="tab active" data-tab="demographics">Demographics</div>
+                        <div class="tab" data-tab="staging">Staging</div>
+                        <div class="tab" data-tab="tumor">Tumor Data</div>
+                        <div class="tab" data-tab="nodes">Lymph Nodes</div>
+                        <div class="tab" data-tab="clinical">Clinical</div>
+                    </div>
+
+                    <form id="cancerForm">
+                        <!-- Demographics Tab -->
+                        <div class="tab-content active" data-content="demographics">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="Age">Age</label>
+                                    <input type="number" id="Age" name="Age" min="0" max="120" placeholder="Patient age" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="Race">Race</label>
+                                    <select id="Race" name="Race" required>
+                                        <option value="">Select race</option>
+                                        <option value="White">White</option>
+                                        <option value="Black">Black</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="Marital_Status">Marital Status</label>
+                                    <select id="Marital_Status" name="Marital_Status" required>
+                                        <option value="">Select status</option>
+                                        <option value="Single">Single</option>
+                                        <option value="Married">Married</option>
+                                        <option value="Divorced">Divorced</option>
+                                        <option value="Widowed">Widowed</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Staging Tab -->
+                        <div class="tab-content" data-content="staging">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="T_Stage">T Stage</label>
+                                    <select id="T_Stage" name="T_Stage" required>
+                                        <option value="">Select T stage</option>
+                                        <option value="T1">T1</option>
+                                        <option value="T2">T2</option>
+                                        <option value="T3">T3</option>
+                                        <option value="T4">T4</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="N_Stage">N Stage</label>
+                                    <select id="N_Stage" name="N_Stage" required>
+                                        <option value="">Select N stage</option>
+                                        <option value="N0">N0</option>
+                                        <option value="N1">N1</option>
+                                        <option value="N2">N2</option>
+                                        <option value="N3">N3</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="6th_Stage">6th Stage</label>
+                                    <select id="6th_Stage" name="6th_Stage" required>
+                                        <option value="">Select 6th stage</option>
+                                        <option value="IIA">IIA</option>
+                                        <option value="IIB">IIB</option>
+                                        <option value="IIIA">IIIA</option>
+                                        <option value="IIIB">IIIB</option>
+                                        <option value="IIIC">IIIC</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="A_Stage">A Stage</label>
+                                    <select id="A_Stage" name="A_Stage" required>
+                                        <option value="">Select A stage</option>
+                                        <option value="Regional">Regional</option>
+                                        <option value="Distant">Distant</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tumor Data Tab -->
+                        <div class="tab-content" data-content="tumor">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="Tumor_Size">Tumor Size (mm)</label>
+                                    <input type="number" id="Tumor_Size" name="Tumor_Size" min="0" max="80" step="0.1" placeholder="Size in mm" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="Grade">Grade</label>
+                                    <select id="Grade" name="Grade" required>
+                                        <option value="">Select grade</option>
+                                        <option value="1">Grade 1</option>
+                                        <option value="2">Grade 2</option>
+                                        <option value="3">Grade 3</option>
+                                        <option value="4">Grade 4</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="differentiate">Differentiation</label>
+                                    <select id="differentiate" name="differentiate" required>
+                                        <option value="">Select type</option>
+                                        <option value="Poorly differentiated">Poorly differentiated</option>
+                                        <option value="Moderately differentiated">Moderately differentiated</option>
+                                        <option value="Well differentiated">Well differentiated</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lymph Nodes Tab -->
+                        <div class="tab-content" data-content="nodes">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="Regional_Node_Examined">Nodes Examined</label>
+                                    <input type="number" id="Regional_Node_Examined" name="Regional_Node_Examined" min="0" placeholder="Number examined" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="Reginol_Node_Positive">Nodes Positive</label>
+                                    <input type="number" id="Reginol_Node_Positive" name="Reginol_Node_Positive" min="0" placeholder="Number positive" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Clinical Tab -->
+                        <div class="tab-content" data-content="clinical">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label for="Survival_Months">Survival Months</label>
+                                    <input type="number" id="Survival_Months" name="Survival_Months" min="0" placeholder="Months since diagnosis" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="submit-section">
+                            <button type="submit">🔬 Analyze Patient Data</button>
+                            <div id="status"></div>
+                            <div id="result"></div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const targetTab = tab.dataset.tab;
+                
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(tc => tc.classList.remove('active'));
+                
+                tab.classList.add('active');
+                document.querySelector(`[data-content="${targetTab}"]`).classList.add('active');
+            });
+        });
+
+        // Form submission
+        document.getElementById('cancerForm').onsubmit = async (e) => {
+            e.preventDefault();
+            
+            const status = document.getElementById('status');
+            const result = document.getElementById('result');
+            const formData = new FormData(document.getElementById('cancerForm'));
+            
+            status.innerHTML = '🔄 Analyzing clinical data...';
+            result.style.display = 'none';
+            
+            try {
+                const response = await fetch('/predict_cancer', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const resultHtml = await response.text();
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = resultHtml;
+                const resultContent = tempDiv.querySelector('#cancerPredictionResult');
+                
+                if (response.ok) {
+                    status.innerHTML = '';
+                    result.innerHTML = resultContent.innerHTML;
+                    result.style.display = 'block';
+                } else {
+                    status.innerHTML = `<span style="color:#ff4757">❌ Error: ${resultContent?.innerHTML || 'Unknown error'}</span>`;
+                }
+            } catch (error) {
+                status.innerHTML = '<span style="color:#ff4757">❌ Error connecting to server.</span>';
+                console.error(error);
+            }
+        };
+    </script>
+</body>
+</html>
