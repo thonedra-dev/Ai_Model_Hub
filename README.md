@@ -13,7 +13,7 @@
 [![Flask](https://img.shields.io/badge/Flask-3.1.2-black.svg?style=flat-square&logo=flask&logoColor=white)](https://flask.palletsprojects.com/)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.10.1-orange.svg?style=flat-square&logo=tensorflow&logoColor=white)](https://www.tensorflow.org/)
 
-[Features](#-features) • [Models](#-available-models) • [Installation](#-installation) • [Usage](#-usage) • [Tech Stack](#-tech-stack) • [Contact](#-contact)
+[Features](#-features) • [Models](#-available-models) • [Installation](#-installation) • [Tech Stack](#-tech-stack)• [Tech Stack](#-architecture) • [Contact](#-contact)
 
 </div>
 
