@@ -122,7 +122,7 @@ python app.py
 
 6️⃣ **Access the Application**
 ```
-Open your browser and navigate to: http://localhost:5000
+Open your browser and navigate to: http://localhost:5000 <=== in here, actually, any available port that your local has.
 ```
 
 ---
@@ -186,24 +186,6 @@ transformers==latest
    - File uploads for PDF summarization
 4. **Get Predictions** - Receive instant AI-powered results
 
-
-### For Developers
-
-```python
-# Example: Using a model endpoint
-import requests
-
-# Cancer prediction
-data = {
-    'feature1': value1,
-    'feature2': value2,
-    # ... other features
-}
-
-response = requests.post('http://localhost:5000/predict/cancer', json=data)
-result = response.json()
-```
-
 ---
 
 ## 🏗️ Architecture
@@ -222,65 +204,11 @@ AI_Model_Hub/
 │   └── upload_pdf.html   # PDF summarization
 ├── static/
 │   └── images/           # UI screenshots
-├── models/               # Trained model files (.pkl, .h5)
+├── deeplearning_models/  # Trained model files (.pkl, .h5)
+├── supervised_models/    # Trained model files (.joblib)
 ├── requirements.txt      # Python dependencies
-└── README.md            # Project documentation
+└── README.md             # Project documentation
 ```
-
----
-
-## 🔧 Model Training
-
-### Traditional ML Models (RandomForest, XGBoost)
-- Trained on curated datasets for each domain
-- Hyperparameter tuning performed
-- Cross-validation implemented
-- Serialized using `joblib`
-
-### Deep Learning Models (TensorFlow)
-- Custom neural network architectures
-- Transformer-based NLP models
-- Email classification using BERT-like architecture
-- Models saved in HDF5 format
-
-### Pre-trained Models
-- **PDF Summarization**: Facebook BART-large-CNN
-- Accessed via Hugging Face Transformers API
-
----
-
-
-## 🎨 Features by Category
-
-### 📊 Regression Models
-- **House Price Prediction** - Real estate market analysis
-- **Car Price Prediction** - Automotive valuation
-
-### 🎯 Classification Models
-- **Cancer Prediction** - Medical diagnostics support
-- **Wine Quality** - Quality grading system
-- **Student Performance** - Academic prediction
-
-### 🗣️ NLP Models
-- **Email Classification** - Smart email filtering
-- **PDF Summarization** - Document intelligence
-
----
-
-## 🛠️ Development
-
-### Adding New Models
-
-1. Train your model and save it
-2. Create a new HTML template in `templates/`
-3. Add route handler in `app.py`
-4. Update this README
-
-### Project Structure Best Practices
-- Keep models in `models/` directory
-- Store static assets in `static/`
-- Follow Flask conventions
-- Maintain dependency versions
 
 ---
 
@@ -311,18 +239,6 @@ of this software and associated documentation files...
 *Passionate about AI/ML and building intelligent systems*
 
 </div>
-
----
-
-## 🤝 Contributing
-
-Contributions, issues, and feature requests are welcome!
-
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
 
 ---
 
