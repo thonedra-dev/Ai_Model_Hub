@@ -174,21 +174,7 @@ transformers==latest
 
 ---
 
-## 🎯 Usage
-
-### For End Users
-
-1. **Navigate to Homepage** - Browse available models
-2. **Select a Model** - Click on your desired prediction model
-3. **Input Data** - Fill in the required form fields
-   - Numerical inputs for regression models
-   - Text inputs for NLP models
-   - File uploads for PDF summarization
-4. **Get Predictions** - Receive instant AI-powered results
-
----
-
-## 🏗️ Architecture
+### 🏗️ Architecture
 
 ```
 AI_Model_Hub/
@@ -260,28 +246,9 @@ If this project helped you, please consider giving it a ⭐️!
 </div>
 
 ---
-
-## 🔮 Future Enhancements
-
-- [ ] Add model performance metrics dashboard
-- [ ] Implement user authentication
-- [ ] Deploy to cloud platform (AWS/Azure/GCP)
-- [ ] Add API documentation (Swagger/OpenAPI)
-- [ ] Implement model versioning
-- [ ] Add batch prediction capabilities
-- [ ] Create mobile-responsive UI improvements
-- [ ] Add more pre-trained models
-
----
-
 <div align="center">
 
 ### 🌟 Built with passion for AI/ML excellence 🌟
 
 **Made with ❤️ by Thonedra**
-
----
-
-*Last Updated: 2024*
-
 </div>
