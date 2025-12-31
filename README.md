@@ -185,7 +185,7 @@ transformers==latest
    - Text inputs for NLP models
    - File uploads for PDF summarization
 4. **Get Predictions** - Receive instant AI-powered results
-5. **Download Models** - Access Google Drive links for model downloads
+
 
 ### For Developers
 
@@ -249,19 +249,6 @@ AI_Model_Hub/
 
 ---
 
-## 📥 Download Models
-
-All trained models are available for download via Google Drive:
-
-🔗 **[Access Model Repository](https://drive.google.com/your-link-here)**
-
-Each model includes:
-- Serialized model file (`.pkl` or `.h5`)
-- Training metadata
-- Feature specifications
-- Usage instructions
-
----
 
 ## 🎨 Features by Category
 
