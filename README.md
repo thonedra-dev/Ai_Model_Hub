@@ -35,36 +35,6 @@
 </div>
 
 ---
-
-## ✨ Features
-
-<table>
-<tr>
-<td width="50%">
-
-### 🎯 Core Capabilities
-- **Multi-Model Support** - Access 7+ trained AI models
-- **Real-time Predictions** - Instant results through web interface
-- **Model Downloads** - Export trained models for local use
-- **User-Friendly UI** - Intuitive forms for data input
-- **Responsive Design** - Works seamlessly across devices
-
-</td>
-<td width="50%">
-
-### 🔬 Model Types
-- **Traditional ML** - RandomForest, XGBoost
-- **Deep Learning** - TensorFlow Neural Networks
-- **NLP Models** - Transformer-based text analysis
-- **Regression & Classification** - Diverse prediction tasks
-- **Pre-trained APIs** - State-of-the-art summarization
-
-</td>
-</tr>
-</table>
-
----
-
 ## 🧠 Available Models
 
 | Model | Type | Task | Technology | Status |
