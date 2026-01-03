@@ -42,10 +42,10 @@
 | 🩺 **Cancer Prediction** | Classification | Medical diagnosis prediction | RandomForest / XGBoost | ✅ Active |
 | 🚗 **Car Price Prediction** | Regression | Vehicle valuation | RandomForest / XGBoost | ✅ Active |
 | 🏠 **House Price Prediction** | Regression | Real estate valuation | RandomForest / XGBoost | ✅ Active |
-| 🎓 **Student Performance** | Classification/Regression | Academic outcome prediction | RandomForest / XGBoost | ✅ Active |
+| 🎓 **Student Performance** | Regression | Academic outcome prediction | RandomForest / XGBoost | ✅ Active |
 | 🍷 **Wine Quality Assessment** | Classification | Wine quality grading | RandomForest / XGBoost | ✅ Active |
 | 📧 **Email Classification** | NLP Classification | Spam/category detection | TensorFlow Transformers | ✅ Active |
-| 📄 **PDF Summarization** | NLP Summarization | Document summarization | BART (facebook/bart-large-cnn) | ✅ Active |
+| 📄 **PDF Summarization** | NLP Summarization | Document summarization | BART (facebook/bart-large-cnn) | ✅ Pre-trained |
 
 ---
 
